@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import Drawer2 from "./Components/Drawer";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import {  useSelector } from "react-redux";
 import SignIn from "./Components/SignIn";
 
 function App() {
-  const userRoles = useSelector((state) => state.user.loggedInUser);
-  const dispatch = useDispatch();
+  const userRoles = useSelector((state) => state.app.Role.loggedInUser);
+
 
   return (
     <BrowserRouter>

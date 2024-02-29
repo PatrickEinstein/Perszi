@@ -1,16 +1,8 @@
-import {
-  Box,
-  Button,
-  IconButton,
-  Stack,
-  Switch,
-  Typography,
-} from "@mui/material";
+import { Button, IconButton, Stack, Typography } from "@mui/material";
 import React, { useCallback, useEffect, useState } from "react";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import DialogueModal from "./DialogueModal";
 import BootLoader from "./Bootloader";
-import AdminTabs from "./Tabs";
 import MyButtons from "./Button";
 import {
   CreateAdmin,
@@ -24,6 +16,7 @@ const Administrator = () => {
   const [showTip, setShowTip] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
   const [openLoader, setOpenLoader] = useState(true);
+  const [currentAdmin, setCurrentAdmin] = useState("");
   const [buttonIdentity, setButtonIdentity] = useState({
     api: "scroles/all",
     button: "admin",
@@ -59,7 +52,8 @@ const Administrator = () => {
     [mode]
   );
 
-  const handleTogglePassword = () => {
+  const handleTogglePassword = (currentAdmin) => {
+    setCurrentAdmin(currentAdmin);
     setShowTip((prevShowTip) => !prevShowTip);
   };
 
@@ -75,7 +69,25 @@ const Administrator = () => {
   }, [Page, AdminsFound, buttonIdentity]);
 
   return (
-    <Stack justifyContent="space-between" height="95vh">
+    <Stack
+      justifyContent="space-between"
+      height="95vh"
+      s={{
+        "&::-webkit-scrollbar": {
+          width: "0.1rem",
+        },
+        "&::-webkit-scrollbar-track": {
+          background: "transparent",
+        },
+        "&::-webkit-scrollbar-thumb": {
+          background: "transparent",
+        },
+        "&::-webkit-scrollbar-thumb:hover": {
+          background: "transparent",
+        },
+        scrollbarGutter: "unset",
+      }}
+    >
       <Stack direction="row" justifyContent="space-around" mb="2rem">
         <Button
           variant="contained"
@@ -91,7 +103,9 @@ const Administrator = () => {
             fontSize: 40,
             cursor: "pointer",
             backgroundColor:
-              buttonIdentity.button === "Staffs" ? "green" : "blue",
+              buttonIdentity.button === "Staffs" ? "yellow" : "blue",
+            borderBottom:
+              buttonIdentity.button === "Staffs" ? "5px red solid" : "blue",
             width: "40%",
           }}
         >
@@ -111,7 +125,10 @@ const Administrator = () => {
             fontSize: 40,
             cursor: "pointer",
             backgroundColor:
-              buttonIdentity.button === "admin" ? "green" : "blue",
+              buttonIdentity.button === "admin" ? "yellow" : "blue",
+            borderBottom:
+              buttonIdentity.button === "Staffs" ? "5px red solid" : "blue",
+
             width: "40%",
           }}
         >
@@ -142,6 +159,7 @@ const Administrator = () => {
             {openLoader ? (
               <BootLoader open={openLoader} />
             ) : (
+              allUsers.length > 0 &&
               allUsers?.map(
                 ({ user_type, iduse, id, email, username }, index) => (
                   <>
@@ -171,7 +189,7 @@ const Administrator = () => {
                         {buttonIdentity.api === "scroles/all" && (
                           <IconButton
                             onClick={() => {
-                              handleTogglePassword();
+                              handleTogglePassword(iduse);
                               setSelectedUser({
                                 email: email,
                                 user_type: user_type,
@@ -186,15 +204,20 @@ const Administrator = () => {
                         )}
                       </td>
                     </tr>
-                    <DialogueModal
-                      open={showTip}
-                      onClose={handleTogglePassword}
-                      user_type={selectedUser.user_type}
-                      iduse={selectedUser.iduse}
-                      email={selectedUser.email}
-                      username={selectedUser.username}
-                      id={selectedUser.id}
-                    />
+                    {showTip && currentAdmin === iduse && (
+                      <tr>
+                        <td colSpan="6">
+                          <DialogueModal
+                            onClose={handleTogglePassword}
+                            user_type={selectedUser.user_type}
+                            iduse={selectedUser.iduse}
+                            email={selectedUser.email}
+                            username={selectedUser.username}
+                            id={selectedUser.id}
+                          />
+                        </td>
+                      </tr>
+                    )}
                   </>
                 )
               )

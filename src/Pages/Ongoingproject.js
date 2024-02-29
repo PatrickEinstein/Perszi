@@ -12,6 +12,7 @@ import BootLoader from "../Components/Bootloader";
 import {
   GetAllOngoingStore,
   GetAllStores,
+  GetAllinprogress,
 } from "../Components/RepositoryService/Requests";
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -28,10 +29,14 @@ function Ongoingprojec(props) {
   const [searchParams, setSearchParameter] = useState("");
   const [Store, setAllStores] = useState([]);
   const [open, setOpen] = React.useState(true);
+  const [pageCount, setPageCount] = useState(1);
 
   const getAllOngoingStore = useCallback(async () => {
-    const response = await GetAllOngoingStore(currentPage, searchParams);
-    setAllStores(response);
+    const response = await GetAllinprogress(currentPage, searchParams);
+    // const response = await GetAllOngoingStore(currentPage, searchParams);
+    setAllStores(response.results);
+    setPageCount(Math.ceil(response.count / 10));
+
     setOpen(false);
   }, [currentPage, searchParams]);
 
@@ -94,31 +99,29 @@ function Ongoingprojec(props) {
         >
           <BootLoader open={open} />
           {Store?.map(
-            ({ id, website_url, name, store_method, scraping_status }) => (
-              <Grid item xs={12} sm={12} md={12} key={id}>
-                <Item
-                  sx={{
-                    paddingLeft: 0,
-                    marginLeft: 0,
-                    opacity: 1.0,
-                    height: "auto",
-                    width: "100%",
-                  }}
-                >
-                  <ProjectStartCard
-                    mode="ONGOING"
-                    id={id}
-                    website_url={website_url}
-                    name={name}
-                    store_method={store_method}
-                    scraping_status={scraping_status}
-                    label="See more info"
-                    Store={Store}
-                    currentPage={currentPage}
-                    pageSize={pageSize}
-                    currentObjects={Store}
-                  />
-                </Item>
+            ({
+              id,
+              website_url,
+              name,
+              store_method,
+              scraping_status,
+              category_url,
+            }) => (
+              <Grid item xs={12} sm={12} md={6} key={id}>
+                <ProjectStartCard
+                  mode="ONGOING"
+                  id={id}
+                  website_url={website_url}
+                  category_url={category_url}
+                  name={name}
+                  store_method={store_method}
+                  scraping_status={scraping_status}
+                  label="See more info"
+                  Store={Store}
+                  currentPage={currentPage}
+                  pageSize={pageSize}
+                  currentObjects={Store}
+                />
               </Grid>
             )
           )}
@@ -136,23 +139,20 @@ function Ongoingprojec(props) {
           width="15%"
           text="Less"
           onClick={() => {
-            setCurrentPage((prev) => (prev > 24 ? prev - 25 : prev - 0));
-            setPageSize((prev) => (prev > 24 ? prev - 25 : prev - 0));
+            setCurrentPage((prev) => prev - 1);
           }}
         />
-        <Typography color="white">
-          Showing {currentPage} to {pageSize + 1}
-        </Typography>
+        <Typography color="blue">{currentPage}</Typography>
         <MyButtons
+          disabled={pageCount === currentPage ? true : false}
           width="15%"
           text="More"
           onClick={() => {
-            setCurrentPage((prev) =>
-              prev < Store.length ? prev + 25 : prev + 0
-            );
-            setPageSize((prev) => (prev < Store.length ? prev + 25 : prev + 0));
+            setCurrentPage((prev) => prev + 1);
           }}
-        />
+        >
+          More
+        </MyButtons>
       </Stack>
     </Stack>
   );

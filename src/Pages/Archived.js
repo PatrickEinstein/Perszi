@@ -10,7 +10,7 @@ import MyButtons from "../Components/Button";
 import { useDispatch, useSelector } from "react-redux";
 
 import BootLoader from "../Components/Bootloader";
-import { GetAllScrapped } from "../Components/RepositoryService/Requests";
+import { GetAllArchived, GetAllScrapped } from "../Components/RepositoryService/Requests";
 import Console from "../Components/console";
 import { toggleopenModal } from "../Redux/reducer";
 
@@ -22,7 +22,7 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-function Projectresult(props) {
+function Archived(props) {
   const dispatch = useDispatch();
   const [Stores, setAllStores] = useState([]);
   const [searchParams, setSearchParameter] = useState([]);
@@ -32,7 +32,7 @@ function Projectresult(props) {
   const openModal = useSelector((state) => state.auth.openModal);
 
   const getAllStoresResult = useCallback(async () => {
-    const response = await GetAllScrapped(currentPage, searchParams);
+    const response = await GetAllArchived(currentPage, searchParams);
     setAllStores(response.results);
     setPageCount(Math.ceil(response.count / 10));
     setOpen(false);
@@ -199,4 +199,4 @@ function Projectresult(props) {
   );
 }
 
-export default Projectresult;
+export default Archived;

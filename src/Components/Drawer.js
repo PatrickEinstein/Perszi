@@ -22,28 +22,22 @@ import { faker } from "@faker-js/faker";
 import { toggleopenModal, toggleopenModal2 } from "../Redux/reducer";
 import {
   Dashboard,
-  Security,
-  SupportAgentOutlined,
-  LogoutOutlined,
   Notifications,
   AddTask,
   HourglassBottom,
   FileDownloadDone,
-  Settings,
   AdminPanelSettingsRounded,
 } from "@mui/icons-material";
 import PublicIcon from "@mui/icons-material/Public";
 
-import { setLoggedInUser, setProfileIndex } from "../Redux/reducer";
+import { setProfileIndex } from "../Redux/reducer";
 import { useDispatch, useSelector } from "react-redux";
-
-import { useMediaQuery } from "@mui/material";
 import Mainboard from "./mainboard";
 
-import Console from "./console";
-import EditConsole from "./editConsole";
 import { useNavigate } from "react-router-dom";
 import MyButtons from "./Button";
+import { setLoggedInUser } from "../Redux/roleReducer";
+import { Archive,  UserCircle } from "phosphor-react";
 
 const drawerWidth = 240;
 
@@ -98,13 +92,13 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 export default function Drawer2() {
   const theme = useTheme();
   const navigate = useNavigate();
-  const openModal = useSelector((state) => state.user.openModal);
-  const openModal2 = useSelector((state) => state.user.openModal2);
+
+  // console.log({openModal, openModal2})
   const [open, setOpen] = React.useState(true);
   const dispatch = useDispatch();
-  const userRoles = useSelector((state) => state.user.loggedInUser);
-  const userInfo = useSelector((state) => state.user.user);
-
+  const userRoles = useSelector((state) => state.app.Role.loggedInUser);
+  const userInfo = useSelector((state) => state.auth.user);
+ 
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -120,22 +114,22 @@ export default function Drawer2() {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar position="fixed" open={open}>
-        <Toolbar>
-          <IconButton
-            color="green"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{
-              mr: 2,
-              ...(open && { display: "none" }),
-            }}
-          >
-            <MenuIcon color="green" />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
+      {/* <AppBar position="fixed" open={open}> */}
+      <Toolbar>
+        <IconButton
+          color="green"
+          aria-label="open drawer"
+          onClick={handleDrawerOpen}
+          edge="start"
+          sx={{
+            mr: 2,
+            ...(open && { display: "none" }),
+          }}
+        >
+          <MenuIcon color="green" />
+        </IconButton>
+      </Toolbar>
+      {/* </AppBar> */}
       <Drawer
         sx={{
           width: drawerWidth,
@@ -186,16 +180,21 @@ export default function Drawer2() {
               paddingTop: 5,
             }}
           >
-            <Avatar alt="Profile" src={faker.image.avatar()} />
-
-            <Typography
-              sx={{
-                paddingTop: 1,
-                fontWeight: 'bold',
-              }}
-            >
-              {userInfo.user_type}   {userInfo.id}
-            </Typography>
+            <div>
+              <UserCircle
+                style={{
+                  fontSize:'50px'
+                }}
+              />
+              <Typography
+                sx={{
+                  paddingTop: 1,
+                  fontWeight: "bold",
+                }}
+              >
+                {userInfo.username} {userInfo.email}
+              </Typography>
+            </div>
             <IconButton>
               <PublicIcon
                 sx={{
@@ -225,11 +224,12 @@ export default function Drawer2() {
                 text: "Project Result",
                 icon: <FileDownloadDone />,
               },
-              { text: "Dashboard", icon: <Dashboard /> },
+              // { text: "Dashboard", icon: <Dashboard /> },
               userRoles[3] !== "X" && {
                 text: "Administrator",
                 icon: <AdminPanelSettingsRounded />,
               },
+              { text: "Archived", icon: <Archive /> },
             ].map(({ text, icon }, index) => (
               <ListItem
                 key={index}
@@ -239,12 +239,19 @@ export default function Drawer2() {
                 <ListItemButton>
                   <ListItemIcon
                     sx={{
-                      color: "blue",
+                      color: "black",
+                      fontFamily: "sofia, sans-serif",
                     }}
                   >
                     {icon}
                   </ListItemIcon>
-                  <ListItemText primary={text} />
+                  <ListItemText
+                    primary={text}
+                    sx={{
+                      color: "black",
+                      fontFamily: "sofia, sans-serif",
+                    }}
+                  />
                 </ListItemButton>
               </ListItem>
             ))}
@@ -262,12 +269,6 @@ export default function Drawer2() {
       </Drawer>
       <Main open={open}>
         <Mainboard />
-        {openModal ? (
-          <Console onClick={() => dispatch(toggleopenModal())} />
-        ) : null}
-        {openModal2 ? (
-          <EditConsole onClick={() => dispatch(toggleopenModal2())} />
-        ) : null}
       </Main>
     </Box>
   );

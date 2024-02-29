@@ -14,51 +14,10 @@ import MyButtons from "./Button";
 import { useSelector } from "react-redux";
 import { useState } from "react";
 import MultiLineTextField from "./MultilineText";
-import { EditProduct } from "./RepositoryService/Requests";
-
-const Fade = React.forwardRef(function Fade(props, ref) {
-  const {
-    children,
-    in: open,
-    onClick,
-    onEnter,
-    onExited,
-    ownerState,
-    ...other
-  } = props;
-  const style = useSpring({
-    from: { opacity: 0 },
-    to: { opacity: open ? 1 : 0 },
-    onStart: () => {
-      if (open && onEnter) {
-        onEnter(null, true);
-      }
-    },
-    onRest: () => {
-      if (!open && onExited) {
-        // onExited(null, true);
-      }
-    },
-  });
-
-  return (
-    <animated.div ref={ref} style={style} {...other}>
-      {React.cloneElement(children, { onClick })}
-    </animated.div>
-  );
-});
-
-Fade.propTypes = {
-  children: PropTypes.element.isRequired,
-  in: PropTypes.bool,
-  onClick: PropTypes.any,
-  onEnter: PropTypes.func,
-  onExited: PropTypes.func,
-  ownerState: PropTypes.any,
-};
+import { DELETEProduct, EditProduct } from "./RepositoryService/Requests";
 
 const EditConsole = ({ onClick }) => {
-  const job = useSelector((state) => state.user.product);
+  const job = useSelector((state) => state.auth.product);
   const isNonMobileScreen = useMediaQuery("(min-width: 600px)");
   const [open, setOpen] = useState(true);
   const [title, setTitle] = useState("");
@@ -67,16 +26,20 @@ const EditConsole = ({ onClick }) => {
   const [discount, setDiscount] = useState("");
   const [description, setDiscription] = useState("");
 
-  console.log({ ProductInfo: job });
-
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(true);
+  const OnDELETEProduct = React.useCallback(async () => {
+    try {
+      DELETEProduct(job.id);
+      setOpen(false);
+    } catch (err) {
+      setOpen(false);
+    }
+  }, []);
 
   const OnEditProduct = React.useCallback(async () => {
     try {
       const Payload = {
         title: title ? title : job?.title,
-        image_url: image ? job?.image_url : job?.image_url,
+        image_url: image ? image : job?.image_url,
         discount_price: discount ? discount : parseInt(job?.discount_price),
         main_price: price ? price : job?.main_price,
         description: description ? description : job?.description,
@@ -85,161 +48,125 @@ const EditConsole = ({ onClick }) => {
     } catch (err) {
       setOpen(false);
     }
-  },[image,discount,job,price,title,description]);
-
-  const style = {
-    transform: "translate(20%, 5%)",
-    width: isNonMobileScreen ? "65%" : "65%",
-    overflow: "auto",
-    height: 720,
-    // maxHeight: isNonMobileScreen ? "100%" : 500,
-    bgcolor: "background.paper",
-    opacity: 1.0,
-    border: "2px solid #000",
-    boxShadow: 24,
-    borderRadius: 8,
-    p: 4,
-    overflow: isNonMobileScreen ? "auto" : "scroll",
-    "&::-webkit-scrollbar": {
-      width: "0.1rem",
-    },
-    "&::-webkit-scrollbar-track": {
-      background: "transparent",
-    },
-    "&::-webkit-scrollbar-thumb": {
-      background: "transparent",
-    },
-    "&::-webkit-scrollbar-thumb:hover": {
-      background: "transparent",
-    },
-    scrollbarWidth: "none",
-    scrollbarGutter: "unset",
-  };
+  }, [image, discount, job, price, title, description]);
 
   return (
-    <div>
-      <Modal
-        aria-labelledby="spring-modal-title"
-        aria-describedby="spring-modal-description"
-        open={open}
-        onClose={handleClose}
-        closeAfterTransition
-        slots={{ backdrop: Backdrop }}
-        slotProps={{
-          backdrop: {
-            TransitionComponent: Fade,
-          },
+    <Stack
+      spacing={2}
+      sx={{
+        padding: "3rem",
+      }}
+    >
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        sx={{
+          paddingLeft: 1,
+          paddingRight: 1,
         }}
       >
-        <Fade
-          in={open}
+        <Typography
           sx={{
-            borderRadius: 10,
+            color: "blueviolet",
+            fontWeight: "bold",
+            size: 40,
           }}
         >
-          <Stack spacing={2} sx={style}>
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              sx={{
-                paddingLeft: 1,
-                paddingRight: 1,
-              }}
-            >
-              <Typography
-                sx={{
-                  color: "blueviolet",
-                  fontWeight: "bold",
-                  size: 40,
-                }}
-              >
-                Edit Scraped Results
-              </Typography>
-              <MyButtons
-                text="Back"
-                startIcon={<ArrowBackIosIcon />}
-                onClick={onClick}
-              />
-            </Stack>
-            <Typography
-              sx={{
-                color: "blueviolet",
-                fontWeight: "bold",
-                size: 35,
-              }}
-            >
-              {job?.title}
-            </Typography>
-            <UploadWidget
-              image={image}
-              setImage={setImage}
-              // job={selectedJob.image}
-            />
-            <Stack spacing={3}>
-              <TextField
-                id="outlined-basic"
-                label="title"
-                variant="outlined"
-                placeholder="Edit title"
-                defaultValue={job?.title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-              <TextField
-                id="outlined-basic"
-                label="Price"
-                variant="outlined"
-                placeholder="Edit price"
-                defaultValue={job?.main_price}
-                onChange={(e) => setPrice(e.target.value)}
-              />
-              <TextField
-                id="outlined-basic"
-                label="Discount"
-                variant="outlined"
-                placeholder="Edit discount"
-                defaultValue={job?.discount_price}
-                onChange={(e) => setDiscount(e.target.value)}
-              />
-              <MultiLineTextField
-                id="outlined-basic"
-                label="Description"
-                variant="outlined"
-                placeholder="Edit description"
-                defaultValue={job?.description}
-                onChange={(e) => setDiscription(e.target.value)}
-              />
+          Edit Scraped Results
+        </Typography>
+        <MyButtons
+          text="Back"
+          startIcon={<ArrowBackIosIcon />}
+          onClick={onClick}
+        />
+      </Stack>
+      <Typography
+        sx={{
+          color: "blueviolet",
+          fontWeight: "bold",
+          size: 35,
+        }}
+      >
+        {job?.title}
+      </Typography>
+      <img
+        src={image.length > 10 ? image : Image}
+        alt="Result"
+        style={{
+          objectFit: "contain",
+          height: 200,
+          width: 200,
+        }}
+      />
+      <Stack spacing={3}>
+        <TextField
+          id="outlined-basic"
+          label="Image"
+          variant="outlined"
+          placeholder="Image"
+          defaultValue={job?.image_url}
+          onChange={(e) => setImage(e.target.value)}
+        />
+        <TextField
+          id="outlined-basic"
+          label="title"
+          variant="outlined"
+          placeholder="Edit title"
+          defaultValue={job?.title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <TextField
+          id="outlined-basic"
+          label="Price"
+          variant="outlined"
+          placeholder="Edit price"
+          defaultValue={job?.main_price}
+          onChange={(e) => setPrice(e.target.value)}
+        />
+        <TextField
+          id="outlined-basic"
+          label="Discount"
+          variant="outlined"
+          placeholder="Edit discount"
+          defaultValue={job?.discount_price}
+          onChange={(e) => setDiscount(e.target.value)}
+        />
+        <MultiLineTextField
+          id="outlined-basic"
+          label="Description"
+          variant="outlined"
+          placeholder="Edit description"
+          defaultValue={job?.description}
+          onChange={(e) => setDiscription(e.target.value)}
+        />
 
-              <TextField
-                id="outlined-basic"
-                label="Others"
-                variant="outlined"
-                placeholder="Edit others"
-                // onChange={(e) => setOthers(e.target.value)}
-              />
-            </Stack>
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <MyButtons
-                text="Proceed"
-                startIcon={<ArrowBackIosIcon />}
-                onClick={() => {
-                  onClick();
-                  OnEditProduct();
-                }}
-              />
-              <MyButtons
-                text="Delete"
-                startIcon={<ArrowBackIosIcon />}
-                onClick={onClick}
-              />
-            </Stack>
-          </Stack>
-        </Fade>
-      </Modal>
-    </div>
+        <TextField
+          id="outlined-basic"
+          label="Others"
+          variant="outlined"
+          placeholder="Edit others"
+          // onChange={(e) => setOthers(e.target.value)}
+        />
+      </Stack>
+      <Stack direction="row" justifyContent="space-between" alignItems="center">
+        <MyButtons
+          text="Delete"
+          startIcon={<ArrowBackIosIcon />}
+          onClick={() => {
+            OnDELETEProduct();
+            onClick();
+          }}
+        />
+        <MyButtons
+          text="Proceed"
+          startIcon={<ArrowBackIosIcon />}
+          onClick={() => {
+            onClick();
+            OnEditProduct();
+          }}
+        />
+      </Stack>
+    </Stack>
   );
 };
 

@@ -34,9 +34,8 @@ const Login = () => {
       email: email,
       securepass: password,
     });
-
     const calledUser = await User;
-    console.log(calledUser);
+    // console.log(calledUser);
     if (calledUser.success === true) {
     } else {
     }

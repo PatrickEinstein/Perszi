@@ -1,5 +1,4 @@
 import * as React from "react";
-import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import { Typography } from "@mui/material";
 
@@ -22,9 +21,11 @@ export default function MyButtons({
       startIcon={startIcon}
       endIcon={endIcon}
       sx={{
-        backgroundColor: backgroundColor,
+        // backgroundColor: backgroundColor,
+        backgroundColor: "gold",
         width: width,
         height: height,
+        fontFamily:"sofia, sans-serif"
       }}
       disabled={disabled}
     >
@@ -32,7 +33,8 @@ export default function MyButtons({
         style={{ textTransform: "capitalize" }}
         variant="button"
         component="span"
-        color={color}
+        // color={color}
+        color="black"
         fontSize={fontSize}
       >
         {text}

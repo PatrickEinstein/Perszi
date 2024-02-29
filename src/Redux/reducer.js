@@ -3,8 +3,8 @@ import { createSlice } from "@reduxjs/toolkit";
 export const auth = createSlice({
   name: "auth",
   initialState: {
-    loggedInUser: ["X", "X", "X", "X"],
-    typeofProfilePage: "Administrator",
+    // loggedInUser: ["X", "X", "X", "X"],
+    typeofProfilePage: "Create Project",
     openModal: false,
     openModal2: false,
     selectedCollection: {},
@@ -28,9 +28,9 @@ export const auth = createSlice({
     toggleopenModal2: (state, action) => {
       state.openModal2 = !state.openModal2;
     },
-    setLoggedInUser: (state, action) => {
-      state.loggedInUser = action.payload;
-    },
+    // setLoggedInUser: (state, action) => {
+    //   state.loggedInUser = action.payload;
+    // },
     setProfileIndex: (state, action) => {
       state.typeofProfilePage = action.payload;
     },
@@ -46,7 +46,7 @@ export const {
   selectedProductId,
   toggleopenModal2,
   setSignedUpUser,
-  setLoggedInUser,
+  // setLoggedInUser,
   setProfileIndex,
   toggleopenModal,
   setSelectedCollection,

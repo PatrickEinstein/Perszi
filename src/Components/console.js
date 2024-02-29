@@ -1,212 +1,109 @@
 import * as React from "react";
-import PropTypes from "prop-types";
-import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
-import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
-import { useSpring, animated } from "@react-spring/web";
-import { Divider, IconButton, Stack } from "@mui/material";
+import { Grid, IconButton, Stack } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import MyButtons from "./Button";
 import { useSelector, useDispatch } from "react-redux";
-import { DeleteOutline, Edit } from "@mui/icons-material";
-import {
-  selectedProductId,
-  setOpenLoader,
-  toggleopenModal2,
-} from "../Redux/reducer";
+import Image from "../assets/p1.png";
+import { selectedProductId, toggleopenModal2 } from "../Redux/reducer";
 import BootLoader from "./Bootloader";
-import HttpCaller from "./RepositoryService/ApiCaller";
-import {
-  GetAllProducts,
-  GetAllStores,
-  PublishProducts,
-} from "./RepositoryService/Requests";
-
-const Fade = React.forwardRef(function Fade(props, ref) {
-  const {
-    children,
-    in: open,
-    onClick,
-    onEnter,
-    onExited,
-    ownerState,
-    ...other
-  } = props;
-  const style = useSpring({
-    from: { opacity: 0 },
-    to: { opacity: open ? 1 : 0 },
-    onStart: () => {
-      if (open && onEnter) {
-        onEnter(null, true);
-      }
-    },
-    onRest: () => {
-      if (!open && onExited) {
-        // onExited(null, true);
-      }
-    },
-  });
-
-  return (
-    <animated.div ref={ref} style={style} {...other}>
-      {React.cloneElement(children, { onClick })}
-    </animated.div>
-  );
-});
-
-Fade.propTypes = {
-  children: PropTypes.element.isRequired,
-  in: PropTypes.bool,
-  onClick: PropTypes.any,
-  onEnter: PropTypes.func,
-  onExited: PropTypes.func,
-  ownerState: PropTypes.any,
-};
+import { GetAllProducts, PublishProducts } from "./RepositoryService/Requests";
+import { Edit } from "@mui/icons-material";
+import EditConsole from "./editConsole";
 
 const Console = ({ onClick }) => {
   const dispatch = useDispatch();
-  const store = useSelector((state) => state.user.selectedCollection);
+  const store = useSelector((state) => state.auth.selectedCollection);
   const [Products, setAllProducts] = React.useState([]);
   const [currentPage, setCurrentPage] = React.useState(1);
   const [openLoader, setOpenLoder] = React.useState(true);
-  const open = useSelector((state) => state.user.openModal);
-
+  const openModal2 = useSelector((state) => state.auth.openModal2);
   const getAllStoresCallback = React.useCallback(async () => {
     const response = await GetAllProducts(store.id);
     setAllProducts(response);
-  }, [store]);
+    setOpenLoder(false);
+  }, []);
 
   const onPublish = React.useCallback(async (store_id) => {
     const response = await PublishProducts(store_id);
-    // alert(response.message);
   }, []);
 
   React.useEffect(() => {
-    getAllStoresCallback();
-    setOpenLoder(false);
-  }, [getAllStoresCallback, store.id]);
-
-  console.log(`store-info==>`, store);
-
-  const style = {
-    transform: "translate(20%, 3%)",
-    width: "70%",
-    overflow: "auto",
-    height: 700,
-    bgcolor: "background.paper",
-    opacity: 1.0,
-    border: "2px solid #000",
-    boxShadow: 24,
-    borderRadius: 8,
-    p: 4,
-    "&::-webkit-scrollbar": {
-      width: "0.1rem",
-    },
-    "&::-webkit-scrollbar-track": {
-      background: "transparent",
-    },
-    "&::-webkit-scrollbar-thumb": {
-      background: "transparent",
-    },
-    "&::-webkit-scrollbar-thumb:hover": {
-      background: "transparent",
-    },
-    scrollbarWidth: "none",
-    scrollbarGutter: "unset",
-  };
+    setInterval(() => {
+      getAllStoresCallback();
+    }, 5000);
+  }, [store.id]);
 
   return (
-    <div>
-      <Modal
-        aria-labelledby="spring-modal-title"
-        aria-describedby="spring-modal-description"
-        open={open}
-        // onClose={handleClose}
-        closeAfterTransition
-        slots={{ backdrop: Backdrop }}
-        slotProps={{
-          backdrop: {
-            TransitionComponent: Fade,
-          },
-        }}
-      >
-        <Fade
-          in={open}
+    <div spacing={2}>
+      <Stack>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
           sx={{
-            borderRadius: 10,
+            paddingLeft: 1,
+            paddingRight: 1,
           }}
         >
-          <Stack spacing={2} sx={style}>
-            <Stack spacing={2}>
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                sx={{
-                  paddingLeft: 1,
-                  paddingRight: 1,
-                }}
-              >
-                <Typography
-                  sx={{
-                    color: "blueviolet",
-                    fontWeight: "bold",
-                    size: 40,
-                  }}
-                >
-                  Perzi Ai-Scraper
-                </Typography>
-                <Typography
-                  sx={{
-                    color: "blueviolet",
-                    fontWeight: "bold",
-                    size: 40,
-                  }}
-                >
-                  Products in {store.name} store
-                </Typography>
-                <MyButtons
-                  text="Back"
-                  startIcon={<ArrowBackIosIcon />}
-                  onClick={onClick}
-                />
-              </Stack>
-              <Typography
-                sx={{
-                  color: "blueviolet",
-                  fontWeight: "bold",
-                  size: 40,
-                }}
-              >
-                {/* Store: {name} */}
-              </Typography>
-              {openLoader ? (
-                <>
-                  {" "}
-                  <Typography> Fetching Products ...</Typography>
-                  <BootLoader open={openLoader} />
-                </>
-              ) : Products.length > 0 ? (
-                Products?.map(
-                  ({
-                    image_url,
-                    id,
-                    currency_symbol,
-                    discount_price,
-                    description,
-                    main_price,
-                    title,
-                    store_id,
-                  }) => (
-                    <Stack
-                      p="1rem 0.5rem"
-                      sx={{
-                        backgroundColor: "aqua",
-                      }}
-                    >
+          <Typography
+            sx={{
+              color: "green",
+              fontWeight: "bold",
+              size: 40,
+            }}
+          >
+            Perzi Ai-Scraper
+          </Typography>
+          <Typography
+            sx={{
+              color: "green",
+              fontWeight: "bold",
+              size: 40,
+            }}
+          >
+            Products in {store.name} store
+          </Typography>
+          <MyButtons
+            text="Back"
+            startIcon={<ArrowBackIosIcon />}
+            onClick={onClick}
+          />
+        </Stack>
+
+        {openLoader ? (
+          <>
+            <Typography> Fetching Products ...</Typography>
+            <BootLoader open={openLoader} />
+          </>
+        ) : Products.length > 0 ? (
+          <Grid
+            container
+            spacing={{ xs: 2, md: 3 }}
+            sx={{
+              paddingLeft: 0,
+              width: "100%",
+            }}
+          >
+            {Products?.map(
+              ({
+                image_url,
+                id,
+                currency_symbol,
+                discount_price,
+                description,
+                main_price,
+                title,
+                store_id,
+                created_at,
+                update_at,
+              }) => {
+                return (
+                  <Grid item xs={6} sm={6} md={6} key={id}>
+                    <Stack p="1rem 0.5rem" boxShadow="1px 1px gold" spacing={3}>
                       <Typography
                         sx={{
-                          color: "blueviolet",
+                          color: "green",
                           fontWeight: "bold",
                           size: 35,
                         }}
@@ -214,18 +111,7 @@ const Console = ({ onClick }) => {
                         {title}
                       </Typography>
 
-                      <Stack
-                        direction="row"
-                        justifyContent="space-between"
-                        alignItems="left"
-                        width={"100%"}
-                        sx={{
-                          background:
-                            "linear-gradient(to right, #4FA2FF, #000000)",
-                          paddingTop: 1,
-                          paddingBottom: 1,
-                        }}
-                      >
+                      <Stack direction="row">
                         <Stack
                           direction="row"
                           sx={{
@@ -258,16 +144,17 @@ const Console = ({ onClick }) => {
                             <Edit
                               sx={{
                                 fontSize: 40,
+                                color: "gold",
                               }}
                             />
                           </IconButton>
                           <img
-                            src={image_url}
+                            src={image_url ? image_url : Image}
                             alt="Result"
                             style={{
                               objectFit: "contain",
-                              height: "100%",
-                              width: "100%",
+                              height: "50%",
+                              width: "50%",
                             }}
                           />
                         </Stack>
@@ -278,9 +165,11 @@ const Console = ({ onClick }) => {
                         >
                           <Typography
                             sx={{
-                              color: "white",
+                              color: "black",
                               fontWeight: "bold",
                               size: 40,
+                              textTransform: "lowercase",
+                              fontFamily: "sofia, sans-serif",
                             }}
                           >
                             Price: {currency_symbol} {main_price}
@@ -288,54 +177,76 @@ const Console = ({ onClick }) => {
                             Discount: {discount_price}
                             <br />
                             Description : {description}
+                            <br/>
+                            updated: {update_at.split("T")[0]}
                             <br />
+                            Created: {created_at.split("T")[0]}
                           </Typography>
                         </Box>
-                        <MyButtons
-                          text="Publish"
-                          onClick={() => onPublish(store_id)}
-                        />
                       </Stack>
                     </Stack>
-                  )
-                )
-              ) : (
-                <Typography>No Products Found for store </Typography>
-              )}
-            </Stack>
+                  </Grid>
+                );
+              }
+            )}
+          </Grid>
+        ) : (
+          <Typography>
+            You will find the products for this store here{" "}
+          </Typography>
+        )}
+        {openModal2 ? (
+          <div
+            style={{
+              backgroundColor: "rgba(255, 255, 255, 0.5)",
+              backdropFilter: "blur(5px) brightness(0.5)",
+              zIndex: 5,
+              position: "fixed",
+              top: 20,
+              left: "20%",
+              justifyContent: "space-between",
+              width: "75vw",
+              height: "90vh",
+              overflow: "auto",
+              opacity: 1.0,
+              border: "1px solid #000",
+              borderRadius: 8,
+              p: 4,
+              "&::-webkit-scrollbar": {
+                width: "0.1rem",
+              },
+              "&::-webkit-scrollbar-track": {
+                background: "transparent",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                background: "transparent",
+              },
+              "&::-webkit-scrollbar-thumb:hover": {
+                background: "transparent",
+              },
+              scrollbarWidth: "none",
+              scrollbarGutter: "unset",
+            }}
+          >
+            <EditConsole onClick={() => dispatch(toggleopenModal2())} />
+          </div>
+        ) : null}
+      </Stack>
 
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              p="2rem 5rem"
-              sx={{
-                width: "60%",
-                transform: "translate(40%, 3%)",
-              }}
-            >
-              <MyButtons
-                width="15%"
-                text="Less"
-                onClick={() => {
-                  setCurrentPage((prev) => (prev > 0 ? prev - 1 : null));
-                }}
-              >
-                Previous
-              </MyButtons>
-              <Typography color="blue">{currentPage}</Typography>
-              <MyButtons
-                width="15%"
-                text="More"
-                onClick={() => {
-                  setCurrentPage((prev) => prev + 1);
-                }}
-              >
-                More
-              </MyButtons>
-            </Stack>
-          </Stack>
-        </Fade>
-      </Modal>
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        p="2rem 5rem"
+        sx={{
+          width: "60%",
+          transform: "translate(40%, 3%)",
+        }}
+      >
+        {Products.length > 1 && (
+          <MyButtons text="Publish" onClick={() => onPublish(store.id)} />
+        )}
+        <Typography color="blue">{currentPage}</Typography>
+      </Stack>
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Bar,
   Pie,
@@ -9,7 +9,7 @@ import {
 } from "react-chartjs-2";
 import { PieChartsData } from "../ChartsData.js/PieChartData";
 import { Chart as ChartJS } from "chart.js/auto";
-import { Box, Stack } from "@mui/material";
+import {  Stack } from "@mui/material";
 
 const ChartSkeleton = () => {
   const [userData, setUserData] = useState({

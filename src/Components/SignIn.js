@@ -1,48 +1,37 @@
 import React, { useState } from "react";
-import {
-  BadgeMark,
-  Box,
-  Checkbox,
-  IconButton,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Checkbox, IconButton, Stack, Typography } from "@mui/material";
 import MyButtons from "./Button";
 import TextBox from "./TextField";
 import { useNavigate } from "react-router-dom";
-import { setLoggedInUser, setSelectedUser } from "../Redux/reducer";
+import {  setSelectedUser } from "../Redux/reducer";
 import { useDispatch } from "react-redux";
 import Logo from "../assets/p1.png";
 import HttpCaller from "./RepositoryService/ApiCaller";
 import { useCallback } from "react";
 import ToastNotification from "./Toast";
+import { setLoggedInUser } from "../Redux/roleReducer";
 const SignIn = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const [message, setMessage] = useState();
 
+  let payload = {
+    email: email,
+    securepass: password,
+  };
+
   const onSignIn = useCallback(async () => {
-    const user = HttpCaller(
-      "user/login/",
-      "POST",
-      {
-        email: email,
-        securepass: password,
-      },
-      {
-        "Content-Type": "application/json",
-      }
-    );
+    const user = HttpCaller("user/login/", "POST", payload, {
+      "Content-Type": "application/json",
+    });
     const awaitedUser = await user;
     if (awaitedUser.success === true) {
       setMessage(awaitedUser.message);
       dispatch(
         setSelectedUser({
-          id: awaitedUser.user.id,
-          user_type: awaitedUser.user.user_type,
+          username: awaitedUser.user.username,
+          email: awaitedUser.user.email,
         })
       );
       dispatch(setLoggedInUser(awaitedUser.user.roles));
@@ -50,7 +39,7 @@ const SignIn = () => {
       setMessage(awaitedUser.message);
       return;
     }
-  }, []);
+  }, [email, password]);
 
   return (
     <Stack

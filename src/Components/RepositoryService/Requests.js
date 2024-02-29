@@ -15,11 +15,14 @@ export const GetAllStores = async (page, name = "") => {
     name.length > 0
       ? `products/store-list/?search=${name}`
       : `products/store-list/?page=${page}`;
-  const response = await HttpCaller(apiUrl, "GET");
-  const newListOfStores = response?.results.filter(
-    ({ scraping_status }) => scraping_status == "UNSCRAPED"
+  let response = await HttpCaller(apiUrl, "GET");
+  if (!response.results) {
+    return [];
+  }
+  const newListOfStores = response?.results?.filter(
+    ({ scraping_status }) => scraping_status === "UNSCRAPED"
   );
-  console.log({ AllStore: newListOfStores });
+  // console.log({ AllStore: newListOfStores });
   return newListOfStores;
 };
 
@@ -30,10 +33,13 @@ export const GetAllOngoingStore = async (page, name = "") => {
       ? `products/store-list/?search=${name}`
       : `products/store-inprogress/?page=${page}`;
   const response = await HttpCaller(apiUrl, "GET");
-  const newListOfStores = response?.results.filter(
-    ({ scraping_status }) => scraping_status == "INPROGRESS"
+  if (!response.results) {
+    return [];
+  }
+  const newListOfStores = response?.results?.filter(
+    ({ scraping_status }) => scraping_status === "INPROGRESS"
   );
-  console.log({ Ongoing: newListOfStores });
+  // console.log({ Ongoing: newListOfStores });
   return newListOfStores;
 };
 
@@ -44,10 +50,13 @@ export const GetAllStoresResult = async (page, name = "") => {
       ? `products/store-list/?search=${name}`
       : `products/store-scrapped/?page=${page}`;
   const response = await HttpCaller(apiUrl, "GET");
+  if (!response.results) {
+    return [];
+  }
   const newListOfStores = response?.results.filter(
-    ({ scraping_status }) => scraping_status == "SCRAPED"
+    ({ scraping_status }) => scraping_status === "SCRAPED"
   );
-  console.log({ Result: newListOfStores });
+  // console.log({ Result: newListOfStores });
   return newListOfStores;
 };
 
@@ -55,9 +64,53 @@ export const GetAllStoresResult = async (page, name = "") => {
 export const GetAllProducts = async (id) => {
   const apiUrl = "tasks/staging/list/";
   const response = await HttpCaller(apiUrl, "GET");
-  console.log({ Allproducts: response });
-  const newListOfProducts = response?.filter(({ store_id }) => store_id == id);
+  if (!response) {
+    return [];
+  }
+  const newListOfProducts = response?.filter(({ store_id }) => store_id === id);
   return newListOfProducts;
+};
+
+// GET ALL GetAllUnscraped
+export const GetAllUnscraped = async (
+  page,
+  name = "",
+  ordering = "-created_at"
+) => {
+  const apiUrl =
+    name.length > 0
+      ? `products/store-unscrapped/?search=${name}`
+      : `products/store-unscrapped/?page=${page}&ordering=${ordering}`;
+  const response = await HttpCaller(apiUrl, "GET");
+  return response;
+};
+// GET ALL GetAllinprogress
+export const GetAllinprogress = async (page, name = "") => {
+  const apiUrl =
+    name.length > 0
+      ? `products/store-inprogress/?search=${name}`
+      : `products/store-inprogress/?page=${page}`;
+  const response = await HttpCaller(apiUrl, "GET");
+  return response;
+};
+// GET ALL GetAllScrapped
+export const GetAllScrapped = async (page, name = "") => {
+  const apiUrl =
+    name.length > 0
+      ? `products/store-scrapped/?search=${name}`
+      : `products/store-scrapped/?page=${page}`;
+  const response = await HttpCaller(apiUrl, "GET");
+  return response;
+};
+
+// GET ALL GetAllArchived
+export const GetAllArchived = async (page, name = "") => {
+  const apiUrl =
+    name.length > 0
+      ? `products/store-archived/?search=${name}`
+      : `products/store-archived/?page=${page}`;
+  const response = await HttpCaller(apiUrl, "GET");
+  return response;
 };
 
 // START SCRAPING
@@ -79,7 +132,14 @@ export const EditProduct = async (job, Payload) => {
       "Content-Type": "application/json",
     }
   );
-  console.log(`scrapingResponse==>`, response);
+  // console.log(`scrapingResponse==>`, response);
+  return response;
+};
+
+// DELETE PRODUCT
+export const DELETEProduct = async (id) => {
+  const response = await HttpCaller(`tasks/staging/delete/${id}/`, "DELETE");
+  // console.log(`scrapingResponse==>`, response);
   return response;
 };
 
@@ -113,6 +173,9 @@ export const FindAllAdmin = async (buttonIdentity) => {
   const response = await HttpCaller(`user/${buttonIdentity.api}`, "GET");
 
   if (buttonIdentity.api === "tbuser-list") {
+    if (!response) {
+      return [];
+    }
     const newListOfAdmins = response.filter(
       ({ user_type }) =>
         user_type === "administrator" || user_type === "employee"
@@ -128,4 +191,51 @@ export const PublishProducts = async (store_id) => {
     "POST"
   );
   return response;
+};
+
+export const GetAdminDetailsRoleDetails = async (id) => {
+  try {
+    // console.log(id);
+
+    const result = await fetch(
+      `http://51.20.9.134/user/scroles/detail/${id}/`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return result;
+  } catch (err) {
+    console.log(err.message);
+  }
+};
+
+export const OnUpdateCreateUserRole = async (
+  user_type,
+  RoleSelected,
+  iduse,
+  id
+) => {
+  // console.log({ user_type, RoleSelected, iduse,id});
+  try {
+    const result = await fetch(
+      `http://51.20.9.134/user/scroles/update/${id}/`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_type: user_type,
+          roles: RoleSelected,
+          iduse: iduse,
+        }),
+      }
+    );
+    return result;
+  } catch (err) {
+    console.log(err.message);
+  }
 };

@@ -7,9 +7,10 @@ import { Stack } from "@mui/material";
 import CreateProjectScrape from "../Pages/createprojectscrape";
 import ChartSkeleton from "./ChartSkeleton";
 import Administrator from "./Administrator";
+import Archived from "../Pages/Archived";
 
 const Mainboard = () => {
-  const typeofpage = useSelector((state) => state.user.typeofProfilePage);
+  const typeofpage = useSelector((state) => state.auth.typeofProfilePage);
 
   return (
     <Stack
@@ -35,6 +36,9 @@ const Mainboard = () => {
 
           case "Dashboard":
             return <ChartSkeleton />;
+
+          case "Archived":
+            return <Archived />;
 
           default:
             <Ongoingproject />;

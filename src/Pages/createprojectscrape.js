@@ -1,32 +1,38 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { experimentalStyled as styled } from "@mui/material/styles";
-import Box from "@mui/material/Box";
-import Paper from "@mui/material/Paper";
+
 import Grid from "@mui/material/Grid";
-import { Stack, Typography } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
-import { useMediaQuery } from "@mui/material";
-import { ImageLinks } from "../Demodata";
+import { Stack, Switch, Typography } from "@mui/material";
+
 import ProjectStartCard from "../Components/ProjectStartCard";
-import { Store } from "../store";
+
 import MyButtons from "../Components/Button";
 import { useDispatch } from "react-redux";
-import { setOpenLoader } from "../Redux/reducer";
 import BootLoader from "../Components/Bootloader";
-import Checkboxes from "../Components/CheckBox";
-import HttpCaller from "../Components/RepositoryService/ApiCaller";
-import {
-  GetAllStores,
-  SearchStore,
-} from "../Components/RepositoryService/Requests";
 
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
-  ...theme.typography.body2,
-  padding: theme.spacing(2),
-  textAlign: "center",
-  color: theme.palette.text.secondary,
-}));
+import {
+  GetAllUnscraped,
+  StartScraping,
+} from "../Components/RepositoryService/Requests";
+import { Funnel } from "phosphor-react";
+
+const FilterOpts = [
+  {
+    name: "created descending",
+    value: "-created_at",
+  },
+  {
+    name: "created ascending",
+    value: "created_at",
+  },
+  {
+    name: "Updated ascending",
+    value: "updated_at",
+  },
+  {
+    name: "Updated descending",
+    value: "-updated_at",
+  },
+];
 
 function CreateProjectScrape(props) {
   const dispatch = useDispatch();
@@ -34,56 +40,103 @@ function CreateProjectScrape(props) {
   const [searchParams, setSearchParameter] = useState([]);
   const [open, setOpen] = React.useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [isChecked, setIsChecked] = useState({});
-  const [masterCheckboxState, setMasterCheckboxState] = useState(false);
+  const [pageCount, setPageCount] = useState(1);
+  let [checkedList, setCheckedList] = useState([""]);
+  let [ordering, setOrdering] = useState("-created_at");
 
-  const handleMasterCheckboxChange = () => {
-    const newMasterState = !masterCheckboxState;
-    setMasterCheckboxState(newMasterState);
+  const onStartScrapeMany = useCallback(async () => {
+    setOpen(true);
+    for (const { store_id } of Store) {
+      await StartScraping(store_id);
+    }
+    setOpen(false);
+    window.location.reload();
+  }, [Store]);
 
-    const updatedCheckboxStates = {};
-    Object.keys(isChecked).forEach((key) => {
-      updatedCheckboxStates[key] = newMasterState;
-    });
-    setIsChecked(updatedCheckboxStates);
+  const onToggleMasterSwitch = () => {
+    if (checkedList.length > 2) {
+      setCheckedList([""]);
+    } else {
+      const newCheckedList = Store.map(({ store_id }) => store_id);
+      setCheckedList(newCheckedList);
+    }
   };
 
-  const HandleChange = (id) => {
-    setIsChecked((prevState) => ({
-      ...prevState,
-      [id]: !prevState[id],
-    }));
+  const handleChange = (store_id) => {
+    if (checkedList.includes(store_id)) {
+      if (!checkedList) {
+        return [];
+      }
+      var newCheckedList = checkedList.filter((id) => id !== store_id);
+      setCheckedList(newCheckedList);
+    } else {
+      setCheckedList([...checkedList, store_id]);
+    }
   };
-
 
   const getAllStoresCallback = useCallback(async () => {
     setOpen(true);
-    const response = await GetAllStores(currentPage,searchParams);
-    setAllStores(response);
+    const response = await GetAllUnscraped(currentPage, searchParams, ordering);
+
+    setAllStores(response.results);
+    setPageCount(Math.ceil(response.count / 10));
     setOpen(false);
-  }, [currentPage,searchParams]);
+  }, [currentPage, searchParams, ordering]);
 
   useEffect(() => {
-  
     getAllStoresCallback();
- 
   }, [getAllStoresCallback, currentPage]);
 
   return (
     <Stack>
       <Stack justifyContent="center" alignItems="center">
-        <Stack direction="row" justifyContent="space-between" width="60%">
+        <Stack direction="row" justifyContent="space-between" width="80%">
           <Stack>
-            <Typography
-              textAlign="center"
-              sx={{
-                color: "brown",
-                fontWeight: "bold",
-                fontSize: 40,
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
               }}
             >
-              Create Projects
-            </Typography>
+              <Typography
+                textAlign="center"
+                sx={{
+                  color: "brown",
+                  fontWeight: "bold",
+                  fontSize: 30,
+                }}
+              >
+                Create Projects
+              </Typography>
+              <div
+                style={{
+                  marginLeft: "100px",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <Funnel color="black" />
+                <select
+                  style={{
+                    backgroundColor: "gold",
+                    width: "200px",
+                    height: "50px",
+
+                    borderRadius: "50px",
+                    padding: "2px 5px",
+                  }}
+                  onChange={(e) => setOrdering(e.target.value)}
+                >
+                  {FilterOpts.map(({ name, value }) => (
+                    <option key={value} value={value}>
+                      {name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
             <input
               type="text"
               onChange={(e) => setSearchParameter(e.target.value)}
@@ -93,13 +146,6 @@ function CreateProjectScrape(props) {
               }}
             />
             <Typography mt="1,.rem">{searchParams}</Typography>
-          </Stack>
-          <Stack direction="row" justifyContent="space-between">
-            <Typography mt="1.0rem">Select Many</Typography>{" "}
-            <Checkboxes
-              setIsChecked={handleMasterCheckboxChange}
-              isChecked={masterCheckboxState}
-            />
           </Stack>
         </Stack>
       </Stack>
@@ -119,24 +165,43 @@ function CreateProjectScrape(props) {
           "&::-webkit-scrollbar-thumb:hover": {
             background: "transparent",
           },
-       
+
           scrollbarWidth: "none",
           scrollbarGutter: "unset",
         }}
       >
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          marginBottom={5}
+          marginTop={5}
+        >
+          <div>
+            <Typography>Select Many</Typography>
+            <Switch
+              checked={checkedList.length > 2}
+              onChange={onToggleMasterSwitch}
+              inputProps={{ "aria-label": "controlled" }}
+            />
+          </div>
+          <MyButtons
+            text="Scrape All Selected"
+            height={30}
+            onClick={onStartScrapeMany}
+          />
+        </Stack>
         <Grid
           container
           spacing={{ xs: 2, md: 3 }}
           sx={{
             paddingLeft: 0,
             height: "auto",
-            // width: "100%",
           }}
         >
           {open ? (
             <BootLoader open={open} />
           ) : (
-            Store.map(
+            Store?.map(
               (
                 {
                   store_id,
@@ -146,33 +211,29 @@ function CreateProjectScrape(props) {
                   store_method,
                   image_url,
                   status,
+                  category_url,
+                  update_at,
+                  created_at,
                 },
                 index
               ) => (
-                <Grid item xs={12} sm={12} md={12} key={id}>
-                  <Item
-                    sx={{
-                      paddingLeft: 0,
-                      marginLeft: 0,
-                      opacity: 1.0,
-                      height: "100%",
-                      width: "100%",
-                    }}
-                  >
-                    <ProjectStartCard
-                      mode="CREATE"
-                      store_id={store_id}
-                      id={store_id}
-                      website_url={website_url}
-                      name={name}
-                      store_method={store_method}
-                      label="Start project Scrape"
-                      index={index}
-                      HandleChange={HandleChange}
-                      isChecked={isChecked}
-                      setIsChecked={setIsChecked}
-                    />
-                  </Item>
+                <Grid item xs={12} sm={12} md={6} key={id}>
+                  <ProjectStartCard
+                    mode="CREATE"
+                    store_id={store_id}
+                    category_url={category_url}
+                    id={store_id}
+                    website_url={website_url}
+                    name={name}
+                    store_method={store_method}
+                    label="Start project Scrape"
+                    index={index}
+                    handleChange={() => handleChange(store_id)}
+                    checkedList={checkedList}
+                    update_at={update_at}
+                    created_at={created_at}
+                    // setIsChecked={setIsChecked}
+                  />
                 </Grid>
               )
             )
@@ -198,6 +259,7 @@ function CreateProjectScrape(props) {
         </MyButtons>
         <Typography color="blue">{currentPage}</Typography>
         <MyButtons
+          disabled={pageCount === currentPage ? true : false}
           width="15%"
           text="More"
           onClick={() => {

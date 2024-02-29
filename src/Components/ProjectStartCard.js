@@ -1,13 +1,10 @@
-import { Box, Button, IconButton, Stack, Typography } from "@mui/material";
-import React, { useCallback, useState } from "react";
+import { Box, Button, Stack, Switch, Typography } from "@mui/material";
+import React, { useCallback, useEffect, useState } from "react";
 import Image from "../assets/p1.png";
 import MyButtons from "./Button";
 import { useDispatch } from "react-redux";
 import { setSelectedCollection, toggleopenModal } from "../Redux/reducer";
-import LinearWithValueLabel from "../Components/ProgressBar";
-import { Store } from "../store";
 import Checkboxes from "./CheckBox";
-import HttpCaller from "./RepositoryService/ApiCaller";
 import { StartScraping } from "./RepositoryService/Requests";
 
 function ProjectStartCard({
@@ -19,9 +16,12 @@ function ProjectStartCard({
   label,
   mode,
   index,
-  isChecked,
-  HandleChange,
   scraping_status,
+  category_url,
+  update_at,
+  created_at,
+  handleChange,
+  checkedList,
 }) {
   const dispatch = useDispatch();
   const [display, setDisplay] = useState(true);
@@ -46,56 +46,40 @@ function ProjectStartCard({
     <Stack
       direction="row"
       justifyContent="space-around"
-      alignItems="flex-start"
-      width={"100%"}
-      position="relative"
-      backgroundColor="aqua"
+      alignItems="centre"
+      boxShadow="1px 1px  gold"
+      height="100%"
     >
-      <Stack
-        direction="row"
-        sx={{
-          position: "relative",
-          marginLeft: 0,
-          paddingLeft: 5,
-          height: 90,
-        }}
-      >
-        <img
-          src={Image}
-          alt="Result"
-          style={{
-            objectFit: "cover",
-            height: "auto",
-            width: "auto",
-          }}
-        />
-      </Stack>
-
       <Stack
         justifyContent="space-between"
         sx={{
-          width: "50%",
+          width: "80%",
         }}
       >
         <Typography
           sx={{
-            color: "white",
+            color: "black",
             fontWeight: "bold",
             textAlign: "left",
             textTransform: "lowercase",
+            // fontFamily: "sofia, sans-serif",
           }}
         >
           Store ID : {id} <br />
           Store name : {name} <br />
           Store url : {website_url}
+          category url: category_url
           <br />
           Store method : {store_method}
           <br />
+          updated: {update_at?.split("T")[0]}
+          <br />
+          Created: {created_at?.split("T")[0]}
         </Typography>
         <MyButtons
           text={label}
-          backgroundColor="white"
-          color="blue"
+          backgroundColor="gold"
+          color="black"
           width={"50%"}
           onClick={() => {
             if (mode === "RESULT") {
@@ -107,7 +91,7 @@ function ProjectStartCard({
               setMoredetails((prev) => !prev);
             }
           }}
-        />{" "}
+        />
       </Stack>
 
       {moreDetails && (
@@ -116,7 +100,7 @@ function ProjectStartCard({
           width="30rem"
           backgroundColor="white"
           border="1px solid green"
-          borderRadius='20px'
+          borderRadius="20px"
           position="absolute"
           top="1%"
           left="55%"
@@ -154,9 +138,18 @@ function ProjectStartCard({
         </Stack>
       )}
       {mode === "CREATE" ? (
-        <Checkboxes
-          isChecked={isChecked[index]}
-          setIsChecked={() => HandleChange(id)}
+        // <Button
+        //   sx={{
+        //     backgroundColor:
+        //       checkedList.includes(store_id) === true ? "blue" : "red",
+        //   }}
+        //   onClick={() => handleChange(store_id)}
+        // />
+
+        <Switch
+          checked={checkedList.includes(store_id)}
+          onChange={() => handleChange(store_id)}
+          inputProps={{ "aria-label": "controlled" }}
         />
       ) : (
         <Box
@@ -166,12 +159,12 @@ function ProjectStartCard({
         >
           <Typography
             sx={{
-              color: "black",
+              color: "blue",
               fontWeight: "bold",
               size: 40,
             }}
           >
-            Status :<span color="green"> {scraping_status} </span>
+            Status : {scraping_status}
           </Typography>
         </Box>
       )}

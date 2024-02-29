@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -10,6 +9,10 @@ import { Stack, Typography } from "@mui/material";
 import MyButtons from "./Button";
 import ToastNotification from "./Toast";
 import { useCallback } from "react";
+import {
+  GetAdminDetailsRoleDetails,
+  OnUpdateCreateUserRole,
+} from "./RepositoryService/Requests";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -23,6 +26,7 @@ export default function DialogueModal({
   username,
   id,
 }) {
+  var [notifications, setNotifications] = useState("");
   const [roles, setRoles] = React.useState([
     { roleValue: "X", label: "Create New Project" },
     { roleValue: "X", label: "Ongoing Projects" },
@@ -32,30 +36,25 @@ export default function DialogueModal({
       label: "New Project, Ongoing Projects, Project Results",
     },
   ]);
-  var [notifications, setNotifications] = useState("");
-  useEffect(() => {
-    const GetAdminDetails = async () => {
-      try {
-        const response = await fetch(
-          `http://13.60.18.223/user/scroles/detail/${id}/`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        const UserDetails = await response.json();
-        UserDetails.roles.forEach(
-          (obj, index) => (roles[index].roleValue = obj)
-        );
-      } catch (err) {
-        setNotifications(err.message, err);
-      }
-    };
 
-    GetAdminDetails();
+  const GetAdminDetails = useCallback(async () => {
+    try {
+      const response = await GetAdminDetailsRoleDetails(id);
+      const UserDetails = await response.json();
+      const updatedRoles = UserDetails.roles.map((obj, index) => ({
+        roleValue: obj,
+        label: roles[index].label,
+      }));
+
+      setRoles(updatedRoles);
+    } catch (err) {
+      setNotifications(err.message, err);
+    }
   }, [id]);
+
+  useEffect(() => {
+    GetAdminDetails();
+  }, [id, GetAdminDetails]);
 
   const handleChange = (index, value) => {
     const updatedRoles = [...roles];
@@ -73,80 +72,74 @@ export default function DialogueModal({
     setRoles(updatedRoles);
   };
 
-  const RoleSelected = [];
-
-  roles.forEach((role) => RoleSelected?.push(role.roleValue));
-
   const OnUpdateCreateUser = useCallback(async () => {
+    let RoleSelected = [];
+    RoleSelected[0] = roles[0].roleValue
+    RoleSelected[1] = roles[1].roleValue;
+    RoleSelected[2] = roles[2].roleValue;
+    RoleSelected[3] = roles[3].roleValue;
     try {
-      const response = await fetch(
-        `http://13.60.18.223/user/scroles/update/${id}/`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            user_type: user_type,
-            roles: RoleSelected,
-            iduse: iduse,
-          }),
-        }
+      const response = OnUpdateCreateUserRole(
+        user_type,
+        RoleSelected,
+        iduse,
+        id
       );
       const updatedUser = await response.json();
       setNotifications(updatedUser.message);
     } catch (err) {
       setNotifications(err.message);
     }
-  },[]);
+  }, [roles]);
 
   return (
-    <div>
-      <Dialog
-        open={open}
-        TransitionComponent={Transition}
-        keepMounted
-        onClose={onClose}
-        aria-describedby="alert-dialog-slide-description"
-      >
-        <DialogTitle>{"Manage Administrator"}</DialogTitle>
-        <DialogContent>
-          <ToastNotification notification={notifications} />
-          <DialogContentText id="alert-dialog-slide-description">
-            <Stack direction="row" justifyContent="space-between" mb="3rem">
-              <Typography fontWeight="bold">
-                {username} {user_type} {iduse}{" "}
-              </Typography>
-            </Stack>
-            <Stack spacing={3}>
-              {roles.map((role, index) => (
-                <Stack
-                  direction="row"
-                  justifyContent="space-between"
-                  key={`roles-${index}`}
-                >
-                  <Typography>{role.label}</Typography>
-                  <MyButtons
-                    text={
-                      roles[index].roleValue !== "X" ? "Enabled" : "Disabled"
-                    }
-                    onClick={() =>
-                      handleChange(index, roles[index].roleValue === "X")
-                    }
-                  />
-                </Stack>
-              ))}
-            </Stack>
+    <div
+      style={{
+        zIndex: 2,
+        backgroundColor: "rgb(0, 0, 128)",
+        justifyContent: "center",
+        alignItems: "center",
+        maxHeight: "40vh",
+        overflowY: "scroll",
+        // borderRadius: "25px",
+        color: "white",
+        border: "3px solid skyblue",
+        textAlign: "left",
+        padding: "10px",
+        scrollbarWidth: "none",
+        scrollbarColor: "skyblue rgb(0, 0, 128)",
+        lineHeight: "20px",
+      }}
+    >
+      <Stack direction="row" justifyContent="space-between" mb="3rem">
+        <Typography fontWeight="bold">
+          {username} {user_type} {iduse}{" "}
+        </Typography>
+      </Stack>
+      <Stack spacing={3}>
+        {roles.map((role, index) => (
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            key={`roles-${index}`}
+          >
+            <Typography>{role.label}</Typography>
             <MyButtons
-              text="Update Roles"
-              onClick={() => {
-                OnUpdateCreateUser();
-                onClose();
-              }}
+              text={roles[index].roleValue !== "X" ? "Enabled" : "Disabled"}
+              onClick={() =>
+                handleChange(index, roles[index].roleValue === "X")
+              }
             />
-          </DialogContentText>
-        </DialogContent>
-      </Dialog>
+          </Stack>
+        ))}
+      </Stack>
+      <MyButtons
+        text="Update Roles"
+        onClick={() => {
+          OnUpdateCreateUser();
+          onClose();
+        }}
+      />
     </div>
   );
 }
