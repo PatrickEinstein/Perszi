@@ -9,6 +9,7 @@ import {
   DeleteAdmin,
   FindAllAdmin,
 } from "./RepositoryService/Requests";
+import { useSelector } from "react-redux";
 
 const Administrator = () => {
   const [allUsers, setAllUsers] = useState([]);
@@ -21,6 +22,8 @@ const Administrator = () => {
     api: "scroles/all",
     button: "admin",
   });
+  const userInfo = useSelector((state) => state.app.Role.userInfo);
+  const [disabled, setDisabled] = useState(false);
 
   const [Page, setPage] = useState(1);
 
@@ -35,6 +38,7 @@ const Administrator = () => {
 
   const HandleChange = useCallback(
     async (id, iduse) => {
+      setDisabled(true);
       const whichIdToUse = mode === "create" ? iduse : id;
       try {
         const response =
@@ -42,12 +46,20 @@ const Administrator = () => {
             ? CreateAdmin(mode, whichIdToUse)
             : DeleteAdmin(mode, whichIdToUse);
         const updatedUser = await response;
-        alert(updatedUser.message);
+        alert(
+          updatedUser?.status === 201 ||
+            updatedUser?.status === 204 ||
+            updatedUser?.status === 200
+            ? "Success"
+            : ""
+        );
         setOpenLoader(false);
       } catch (err) {
-        alert("AN Error occurred, please try again soon");
         setOpenLoader(false);
+        alert("AN Error occurred, please try again soon");
       }
+      setDisabled(false);
+      AdminsFound();
     },
     [mode]
   );
@@ -170,20 +182,23 @@ const Administrator = () => {
                       <td>{user_type}</td>
                       <td>{iduse}</td>
                       <td>
-                        <MyButtons
-                          text={
-                            buttonIdentity.button === "Staffs"
-                              ? "Create Admin"
-                              : "Destroy Admin"
-                          }
-                          onClick={() => {
-                            buttonIdentity.button === "Staffs"
-                              ? setMode("create")
-                              : setMode("delete");
-                            HandleChange(id, iduse);
-                          }}
-                          inputProps={{ "aria-label": "controlled" }}
-                        />
+                        {userInfo.email !== email && (
+                          <MyButtons
+                            disabled={disabled}
+                            text={
+                              buttonIdentity.button === "Staffs"
+                                ? "Create Admin"
+                                : "Destroy Admin"
+                            }
+                            onClick={() => {
+                              buttonIdentity.button === "Staffs"
+                                ? setMode("create")
+                                : setMode("delete");
+                              HandleChange(id, iduse);
+                            }}
+                            inputProps={{ "aria-label": "controlled" }}
+                          />
+                        )}
                       </td>
                       <td>
                         {buttonIdentity.api === "scroles/all" && (

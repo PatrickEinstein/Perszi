@@ -22,6 +22,7 @@ const EditConsole = ({ onClick }) => {
   const [open, setOpen] = useState(true);
   const [title, setTitle] = useState("");
   const [image, setImage] = useState(job?.image_url);
+  const [url, setImageUrl] = useState(job?.url);
   const [price, setPrice] = useState("");
   const [discount, setDiscount] = useState("");
   const [description, setDiscription] = useState("");
@@ -43,12 +44,13 @@ const EditConsole = ({ onClick }) => {
         discount_price: discount ? discount : parseInt(job?.discount_price),
         main_price: price ? price : job?.main_price,
         description: description ? description : job?.description,
+        url: url ? url : job?.url,
       };
       EditProduct(job, Payload);
     } catch (err) {
       setOpen(false);
     }
-  }, [image, discount, job, price, title, description]);
+  }, [image, discount, job, price, title, description,url]);
 
   return (
     <Stack
@@ -106,6 +108,14 @@ const EditConsole = ({ onClick }) => {
           placeholder="Image"
           defaultValue={job?.image_url}
           onChange={(e) => setImage(e.target.value)}
+        />
+        <TextField
+          id="outlined-basic"
+          label="Url"
+          variant="outlined"
+          placeholder="Url"
+          defaultValue={job?.url}
+          onChange={(e) => setImageUrl(e.target.value)}
         />
         <TextField
           id="outlined-basic"

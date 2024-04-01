@@ -193,6 +193,15 @@ export const PublishProducts = async (store_id) => {
   return response;
 };
 
+
+export const PublishSingleProduct = async (product_id) => {
+  const response = await HttpCaller(
+    `tasks/staging/move-product/${product_id}/`,
+    "POST"
+  );
+  return response;
+};
+
 export const GetAdminDetailsRoleDetails = async (id) => {
   try {
     // console.log(id);

@@ -3,18 +3,20 @@ import { Checkbox, IconButton, Stack, Typography } from "@mui/material";
 import MyButtons from "./Button";
 import TextBox from "./TextField";
 import { useNavigate } from "react-router-dom";
-import {  setSelectedUser } from "../Redux/reducer";
+import { setSelectedUser } from "../Redux/reducer";
 import { useDispatch } from "react-redux";
 import Logo from "../assets/p1.png";
 import HttpCaller from "./RepositoryService/ApiCaller";
 import { useCallback } from "react";
 import ToastNotification from "./Toast";
-import { setLoggedInUser } from "../Redux/roleReducer";
+import { setLoggedInUser, setUserInfo } from "../Redux/roleReducer";
+import BootLoader from "./Bootloader";
 const SignIn = () => {
   const dispatch = useDispatch();
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const [message, setMessage] = useState();
+  const [openLoader, setOpenLoder] = React.useState(false);
 
   let payload = {
     email: email,
@@ -22,14 +24,22 @@ const SignIn = () => {
   };
 
   const onSignIn = useCallback(async () => {
+    setOpenLoder(true);
     const user = HttpCaller("user/login/", "POST", payload, {
       "Content-Type": "application/json",
     });
+    setOpenLoder(false);
     const awaitedUser = await user;
     if (awaitedUser.success === true) {
       setMessage(awaitedUser.message);
+      // dispatch(
+      //   setSelectedUser({
+      //     username: awaitedUser.user.username,
+      //     email: awaitedUser.user.email,
+      //   })
+      // );
       dispatch(
-        setSelectedUser({
+        setUserInfo({
           username: awaitedUser.user.username,
           email: awaitedUser.user.email,
         })
@@ -67,6 +77,7 @@ const SignIn = () => {
         />
         <ToastNotification notification={message} />
       </Stack>
+      <BootLoader open={openLoader} />
 
       <Stack
         spacing={3}
@@ -108,31 +119,7 @@ const SignIn = () => {
           height={60}
           onClick={onSignIn}
         />
-        <Stack direction="row" justifyContent="space-between">
-          <Typography
-            sx={{
-              color: "black",
-              marginRight: 8,
-            }}
-          >
-            <IconButton>
-              <Checkbox />
-            </IconButton>
-            Remember me
-          </Typography>
-
-          <Typography
-            sx={{
-              color: "black",
-              marginTop: 2,
-              marginLeft: 8,
-            }}
-          >
-            Forgot Password?
-          </Typography>
-        </Stack>
       </Stack>
-      {/* </Box> */}
     </Stack>
   );
 };

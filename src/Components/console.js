@@ -8,7 +8,11 @@ import { useSelector, useDispatch } from "react-redux";
 import Image from "../assets/p1.png";
 import { selectedProductId, toggleopenModal2 } from "../Redux/reducer";
 import BootLoader from "./Bootloader";
-import { GetAllProducts, PublishProducts } from "./RepositoryService/Requests";
+import {
+  GetAllProducts,
+  PublishProducts,
+  PublishSingleProduct,
+} from "./RepositoryService/Requests";
 import { Edit } from "@mui/icons-material";
 import EditConsole from "./editConsole";
 
@@ -26,14 +30,18 @@ const Console = ({ onClick }) => {
   }, []);
 
   const onPublish = React.useCallback(async (store_id) => {
-    const response = await PublishProducts(store_id);
+    await PublishProducts(store_id);
+    getAllStoresCallback();
+  }, []);
+
+  const onPublishSingle = React.useCallback(async (product_id) => {
+    await PublishSingleProduct(product_id);
+    getAllStoresCallback();
   }, []);
 
   React.useEffect(() => {
-    setInterval(() => {
-      getAllStoresCallback();
-    }, 5000);
-  }, [store.id]);
+    getAllStoresCallback();
+  }, [store.id, openModal2]);
 
   return (
     <div spacing={2}>
@@ -97,9 +105,10 @@ const Console = ({ onClick }) => {
                 store_id,
                 created_at,
                 update_at,
+                url,
               }) => {
                 return (
-                  <Grid item xs={6} sm={6} md={6} key={id}>
+                  <Grid item xs={12} sm={6} md={6} key={id}>
                     <Stack p="1rem 0.5rem" boxShadow="1px 1px gold" spacing={3}>
                       <Typography
                         sx={{
@@ -110,7 +119,6 @@ const Console = ({ onClick }) => {
                       >
                         {title}
                       </Typography>
-
                       <Stack direction="row">
                         <Stack
                           direction="row"
@@ -137,6 +145,7 @@ const Console = ({ onClick }) => {
                                   description,
                                   main_price,
                                   title,
+                                  url,
                                 })
                               );
                             }}
@@ -158,6 +167,7 @@ const Console = ({ onClick }) => {
                             }}
                           />
                         </Stack>
+
                         <Box
                           sx={{
                             width: "50%",
@@ -169,7 +179,7 @@ const Console = ({ onClick }) => {
                               fontWeight: "bold",
                               size: 40,
                               textTransform: "lowercase",
-                              fontFamily: "sofia, sans-serif",
+                              // fontFamily: "sofia, sans-serif",
                             }}
                           >
                             Price: {currency_symbol} {main_price}
@@ -177,13 +187,18 @@ const Console = ({ onClick }) => {
                             Discount: {discount_price}
                             <br />
                             Description : {description}
-                            <br/>
+                            <br />
                             updated: {update_at.split("T")[0]}
                             <br />
                             Created: {created_at.split("T")[0]}
                           </Typography>
                         </Box>
                       </Stack>
+                      <MyButtons
+                        text="Publish"
+                        width="50%"
+                        onClick={() => onPublishSingle(id)}
+                      />
                     </Stack>
                   </Grid>
                 );

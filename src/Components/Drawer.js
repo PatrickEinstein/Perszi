@@ -97,7 +97,7 @@ export default function Drawer2() {
   const [open, setOpen] = React.useState(true);
   const dispatch = useDispatch();
   const userRoles = useSelector((state) => state.app.Role.loggedInUser);
-  const userInfo = useSelector((state) => state.auth.user);
+  const userInfo = useSelector((state) => state.app.Role.userInfo);
  
   const handleDrawerOpen = () => {
     setOpen(true);

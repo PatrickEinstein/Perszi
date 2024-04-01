@@ -49,6 +49,7 @@ function ProjectStartCard({
       alignItems="centre"
       boxShadow="1px 1px  gold"
       height="100%"
+      overflow="hidden"
     >
       <Stack
         justifyContent="space-between"
@@ -67,8 +68,8 @@ function ProjectStartCard({
         >
           Store ID : {id} <br />
           Store name : {name} <br />
-          Store url : {website_url}
-          category url: category_url
+          Store url : {website_url} <br/>
+          category url: {category_url}
           <br />
           Store method : {store_method}
           <br />

@@ -62,6 +62,8 @@ function CreateProjectScrape(props) {
     }
   };
 
+  // console.log(`checkedList==>`,checkedList)
+
   const handleChange = (store_id) => {
     if (checkedList.includes(store_id)) {
       if (!checkedList) {
@@ -90,13 +92,14 @@ function CreateProjectScrape(props) {
   return (
     <Stack>
       <Stack justifyContent="center" alignItems="center">
-        <Stack direction="row" justifyContent="space-between" width="80%">
+       
           <Stack>
             <div
               style={{
                 display: "flex",
                 flexDirection: "row",
                 justifyContent: "space-between",
+                width:"70vw",
               }}
             >
               <Typography
@@ -147,7 +150,7 @@ function CreateProjectScrape(props) {
             />
             <Typography mt="1,.rem">{searchParams}</Typography>
           </Stack>
-        </Stack>
+        {/* </Stack> */}
       </Stack>
       <Stack
         sx={{
@@ -177,9 +180,10 @@ function CreateProjectScrape(props) {
           marginTop={5}
         >
           <div>
-            <Typography>Select Many</Typography>
+            <Typography>Select All</Typography>
             <Switch
-              checked={checkedList.length > 2}
+              // checked={checkedList.length > 2}
+              checked={checkedList?.length === Store?.length}
               onChange={onToggleMasterSwitch}
               inputProps={{ "aria-label": "controlled" }}
             />
@@ -244,6 +248,7 @@ function CreateProjectScrape(props) {
         direction="row"
         justifyContent="space-between"
         p="0.1rem 2rem"
+        mt="2rem"
         sx={{
           width: "100%",
         }}
