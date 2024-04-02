@@ -46,12 +46,13 @@ function CreateProjectScrape(props) {
 
   const onStartScrapeMany = useCallback(async () => {
     setOpen(true);
-    for (const { store_id } of Store) {
+    for (const store_id  of checkedList) {
+      console.log(store_id)
       await StartScraping(store_id);
     }
     setOpen(false);
     window.location.reload();
-  }, [Store]);
+  }, [checkedList]);
 
   const onToggleMasterSwitch = () => {
     if (checkedList.length > 2) {
