@@ -1,7 +1,7 @@
 const HttpCaller = async (route, Method, body, headers) => {
   try {
     const savedUserResponse = await fetch(
-      `http://51.20.9.134/${route}`,
+      `http://54.87.238.126/${route}`,
       {
         method: `${Method}`,
         body: JSON.stringify(body),
