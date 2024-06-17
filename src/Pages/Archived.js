@@ -23,6 +23,7 @@ function Archived(props) {
   const [pageCount, setPageCount] = useState(1);
   const openModal = useSelector((state) => state.auth.openModal);
 
+  
   const getAllStoresResult = useCallback(async () => {
     const response = await GetAllArchived(currentPage, searchParams);
     setAllStores(response.results);
