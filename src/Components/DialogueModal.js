@@ -1,22 +1,15 @@
 import React, { useEffect, useState } from "react";
-import Dialog from "@mui/material/Dialog";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import Slide from "@mui/material/Slide";
+
 import { Stack, Typography } from "@mui/material";
 
 import MyButtons from "./Button";
-import ToastNotification from "./Toast";
+
 import { useCallback } from "react";
 import {
   GetAdminDetailsRoleDetails,
   OnUpdateCreateUserRole,
 } from "./RepositoryService/Requests";
 
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
 
 export default function DialogueModal({
   open,

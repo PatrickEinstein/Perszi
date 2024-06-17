@@ -1,15 +1,7 @@
 import * as React from "react";
-import PropTypes from "prop-types";
-import Backdrop from "@mui/material/Backdrop";
-import Box from "@mui/material/Box";
-import Modal from "@mui/material/Modal";
-import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { useSpring, animated } from "@react-spring/web";
-import { Divider, IconButton, Stack, TextField } from "@mui/material";
+import {  Stack, TextField } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import UploadWidget from "./DropZone";
-import { useMediaQuery } from "@material-ui/core";
 import MyButtons from "./Button";
 import { useSelector } from "react-redux";
 import { useState } from "react";
@@ -18,7 +10,6 @@ import { DELETEProduct, EditProduct } from "./RepositoryService/Requests";
 
 const EditConsole = ({ onClick }) => {
   const job = useSelector((state) => state.auth.product);
-  const isNonMobileScreen = useMediaQuery("(min-width: 600px)");
   const [open, setOpen] = useState(true);
   const [title, setTitle] = useState("");
   const [image, setImage] = useState(job?.image_url);

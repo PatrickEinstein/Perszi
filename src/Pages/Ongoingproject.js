@@ -1,27 +1,18 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { experimentalStyled as styled } from "@mui/material/styles";
-import Box from "@mui/material/Box";
-import Paper from "@mui/material/Paper";
+
 import Grid from "@mui/material/Grid";
-import { Input, Stack, Typography } from "@mui/material";
+import {  Stack, Typography } from "@mui/material";
 
 import ProjectStartCard from "../Components/ProjectStartCard";
 import MyButtons from "../Components/Button";
 import BootLoader from "../Components/Bootloader";
 
 import {
-  GetAllOngoingStore,
-  GetAllStores,
+
   GetAllinprogress,
 } from "../Components/RepositoryService/Requests";
 
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
-  ...theme.typography.body2,
-  padding: theme.spacing(2),
-  textAlign: "center",
-  color: theme.palette.text.secondary,
-}));
+
 
 function Ongoingprojec(props) {
   const [currentPage, setCurrentPage] = useState(1);

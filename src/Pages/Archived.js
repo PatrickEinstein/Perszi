@@ -1,26 +1,18 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { experimentalStyled as styled } from "@mui/material/styles";
-import Paper from "@mui/material/Paper";
+import React, { useCallback, useEffect, useState } from "react";
+
 import Grid from "@mui/material/Grid";
 import { Stack, Typography } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
 import ProjectStartCard from "../Components/ProjectStartCard";
 import { Store } from "../store";
 import MyButtons from "../Components/Button";
 import { useDispatch, useSelector } from "react-redux";
 
 import BootLoader from "../Components/Bootloader";
-import { GetAllArchived, GetAllScrapped } from "../Components/RepositoryService/Requests";
+import {GetAllArchived} from "../Components/RepositoryService/Requests";
 import Console from "../Components/console";
 import { toggleopenModal } from "../Redux/reducer";
 
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
-  ...theme.typography.body2,
-  padding: theme.spacing(2),
-  textAlign: "center",
-  color: theme.palette.text.secondary,
-}));
+
 
 function Archived(props) {
   const dispatch = useDispatch();
@@ -42,7 +34,6 @@ function Archived(props) {
     getAllStoresResult();
   }, [getAllStoresResult, currentPage]);
 
-  const theme = useTheme();
   return (
     <Stack>
       <Stack justifyContent="center" alignItems="center" sx={{}}>

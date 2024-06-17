@@ -5,10 +5,8 @@ import {
   Line,
   Radar,
   Bubble,
-  Chart,
 } from "react-chartjs-2";
 import { PieChartsData } from "../ChartsData.js/PieChartData";
-import { Chart as ChartJS } from "chart.js/auto";
 import {  Stack } from "@mui/material";
 
 const ChartSkeleton = () => {

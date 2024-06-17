@@ -1,4 +1,4 @@
-import { EditOutlined } from "@mui/icons-material";
+
 import {
   Box,
   Typography,
@@ -7,12 +7,12 @@ import {
 } from "@mui/material";
 import Dropzone from "react-dropzone";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+
 import { Camera, Upload } from "phosphor-react";
 
 const UploadWidget = ({ image, setImage, job }) => {
   // console.log(`image`, image);
-  const dispatch = useDispatch();
+
   const [isImage, setIsImage] = useState(true);
 
   return (

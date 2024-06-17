@@ -1,10 +1,8 @@
-import { Box, Button, Stack, Switch, Typography } from "@mui/material";
-import React, { useCallback, useEffect, useState } from "react";
-import Image from "../assets/p1.png";
+import { Box,Stack, Switch, Typography } from "@mui/material";
+import React, { useCallback, useState } from "react";
 import MyButtons from "./Button";
 import { useDispatch } from "react-redux";
 import { setSelectedCollection, toggleopenModal } from "../Redux/reducer";
-import Checkboxes from "./CheckBox";
 import { StartScraping } from "./RepositoryService/Requests";
 
 function ProjectStartCard({

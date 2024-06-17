@@ -3,7 +3,6 @@ import { styled, useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import CssBaseline from "@mui/material/CssBaseline";
-import MuiAppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
 import Typography from "@mui/material/Typography";
@@ -17,11 +16,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import { Avatar, Stack } from "@mui/material";
-import { faker } from "@faker-js/faker";
-import { toggleopenModal, toggleopenModal2 } from "../Redux/reducer";
 import {
-  Dashboard,
   Notifications,
   AddTask,
   HourglassBottom,
@@ -38,6 +33,7 @@ import { useNavigate } from "react-router-dom";
 import MyButtons from "./Button";
 import { setLoggedInUser } from "../Redux/roleReducer";
 import { Archive,  UserCircle } from "phosphor-react";
+import { Stack } from "@mui/material";
 
 const drawerWidth = 240;
 
@@ -61,24 +57,6 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
   })
 );
 
-const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== "open",
-})(({ theme, open }) => ({
-  transition: theme.transitions.create(["margin", "width"], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  ...(open && {
-    //
-    width: `calc(20% - ${drawerWidth}px)`,
-    marginLeft: `${drawerWidth}px`,
-    transition: theme.transitions.create(["margin", "width"], {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  }),
-  background: "transparent",
-}));
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   // display: "flex",

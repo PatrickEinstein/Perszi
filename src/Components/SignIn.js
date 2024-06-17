@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import { Checkbox, IconButton, Stack, Typography } from "@mui/material";
+import {  Stack, Typography } from "@mui/material";
 import MyButtons from "./Button";
 import TextBox from "./TextField";
-import { useNavigate } from "react-router-dom";
-import { setSelectedUser } from "../Redux/reducer";
 import { useDispatch } from "react-redux";
 import Logo from "../assets/p1.png";
 import HttpCaller from "./RepositoryService/ApiCaller";
