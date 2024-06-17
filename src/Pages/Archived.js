@@ -22,6 +22,7 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
+
 function Archived(props) {
   const dispatch = useDispatch();
   const [Stores, setAllStores] = useState([]);
