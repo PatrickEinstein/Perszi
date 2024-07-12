@@ -1,13 +1,14 @@
+// const url = "http://54.87.238.126" //TEST
+const url = "http://54.160.95.148"; //LIVE
+
 const HttpCaller = async (route, Method, body, headers) => {
+  console.log(`env`,url);
   try {
-    const savedUserResponse = await fetch(
-      `http://54.87.238.126/${route}`,
-      {
-        method: `${Method}`,
-        body: JSON.stringify(body),
-        headers: headers,
-      }
-    );
+    const savedUserResponse = await fetch(`${url}/${route}`, {
+      method: `${Method}`,
+      body: JSON.stringify(body),
+      headers: headers,
+    });
 
     if (!savedUserResponse.ok) {
       const errorData = await savedUserResponse.text();
