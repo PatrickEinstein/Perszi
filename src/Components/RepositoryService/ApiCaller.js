@@ -1,5 +1,6 @@
 // const url = "http://54.87.238.126" //TEST
-const url = "http://54.160.95.148"; //LIVE
+// const url = "http://54.160.95.148"; //LIVE
+const url = "http://54.90.169.200"
 
 const HttpCaller = async (route, Method, body, headers) => {
   console.log(`env`,url);
